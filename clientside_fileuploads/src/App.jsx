@@ -4,10 +4,10 @@ import viteLogo from "/vite.svg";
 import "./App.css";
 
 function App() {
-  const [fileData, setFileData] = useState(null);
+  const [filesData, setFilesData] = useState(null);
 
   const fileChangeHandler = (e) => {
-    setFileData(e.target.files[0]);
+    setFilesData(e.target.files);
   };
 
   const onSubmitHandler = (e) => {
@@ -16,9 +16,12 @@ function App() {
     //handle file data from the state before sending
     const data = new FormData();
 
-    data.append("image", fileData);
-
-    fetch("http://localhost:5000/single", {
+    // If have multiple files, can't just FileList object (or array of files) to FormData object --> need to do each append for file separately
+    // data.append("images", filesData); <--- BAD
+    for (let i = 0; i < filesData.length; i++) {
+      data.append("images", filesData[i]);
+    }
+    fetch("http://localhost:5000/multiple", {
       method: "POST",
       body: data,
     })
@@ -34,7 +37,7 @@ function App() {
     <div className="App">
       <h1>React App File Uploading</h1>
       <form onSubmit={onSubmitHandler}>
-        <input type="file" onChange={fileChangeHandler} />
+        <input type="file" multiple onChange={fileChangeHandler} />
         <br />
         <br />
         <button type="submit">Submit File to Backend</button>
